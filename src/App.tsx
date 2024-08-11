@@ -14,8 +14,7 @@ function App() {
   const {
     dbState: { status },
   } = useDb();
-
-  const data = useSqlWorker(sqlWorkerInstance);
+  useSqlWorker(sqlWorkerInstance);
 
   const isLoading = status === "LOADING";
   const isError = status === "ERROR";
