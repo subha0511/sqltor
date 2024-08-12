@@ -20,7 +20,6 @@ import { insertEmployees } from "../addTable";
 
 const sidebar = () => {
   const tables = useGetTableNames();
-  console.log(tables);
   const { mutate } = useRunQuery();
 
   return (
@@ -49,14 +48,14 @@ const sidebar = () => {
                   Employees
                 </Button>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
+              {/* <DropdownMenuItem asChild>
                 <Button
                   className="hover:bg-neutral-800 w-full pl-5 py-0 h-9 cursor-pointer text-left justify-start"
                   onClick={() => mutate(insertEmployees)}
                 >
                   Employees
                 </Button>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -89,7 +88,6 @@ const sidebar = () => {
 
 const TableInfo = ({ tableName }: { tableName: string }) => {
   const { tableInfo, isError } = useGetTableInfo(tableName);
-  console.log(tableInfo, isError);
 
   if (isError) {
     return <div className="text-red-700">Something went wrong</div>;

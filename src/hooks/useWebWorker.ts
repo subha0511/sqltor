@@ -20,7 +20,6 @@ export const useWebWorker = <TResult, TWorkerPayload>(worker: Worker) => {
 
   useEffect(() => {
     const onMessage = (event: MessageEvent<IBaseWorkerResponse<TResult>>) => {
-      console.log(event);
       setRunning(false);
       setError(event.data.error);
       setResult(event.data.result);

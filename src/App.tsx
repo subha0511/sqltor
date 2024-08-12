@@ -24,12 +24,12 @@ function App() {
   }, []);
 
   return (
-    <div className="bg-zinc-900 min-h-screen w-full flex items-stretch divide-x divide-zinc-700">
-      <div className="min-h-full h-screen w-2/3 shrink-0 flex flex-col">
-        <div className="h-1/2 grow max-h-1/2">
+    <div className="bg-zinc-900 h-screen w-full flex items-stretch divide-x divide-zinc-700">
+      <div className="h-full w-2/3 shrink-0 flex flex-col">
+        <div className="overflow-auto grow h-1/2">
           <Editor value={editorState} onChange={onEditorStateChange} />
         </div>
-        <div className="md:h-1/2 shrink-0">
+        <div className="h-1/2 shrink-0">
           <ResultPreview
             isLoading={isLoading}
             isError={isError}
