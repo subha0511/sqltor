@@ -1,5 +1,4 @@
 import { useRunQuery } from "../query";
-import { insertEmployees } from "../addTable";
 import {
   Table,
   TableCell,
@@ -33,14 +32,14 @@ const ResultPreview = ({
         >
           {isLoading && !isError ? "Loading" : isError ? "Error" : "Run"}
         </button>
-        <button
+        {/* <button
           className="px-4 py-2 rounded-lg bg-zinc-700 text-sm text-zinc-300"
           onClick={() => {
             !isLoading && !isError ? mutate(insertEmployees) : null;
           }}
         >
           {isLoading ? "Loading" : isError ? "Error" : "Insert Employees"}
-        </button>
+        </button> */}
       </div>
       <div className="grow text-zinc-200 w-full max-h-full overflow-y-scroll">
         {data && !data?.results && !data?.error ? (

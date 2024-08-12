@@ -21,6 +21,20 @@ export const runSql = (query: string, db: Database) => {
 
 type RunSqlReturn = ReturnType<typeof runSql>;
 
+export const GET_ALL_TABLE_INFO = "GET_ALL_TABLE_INFO";
+export const useGetAllTableInfo = () => {
+  const {
+    dbState: { db },
+  } = useDb();
+  return useQuery({
+    queryKey: [GET_ALL_TABLES],
+    queryFn: () => {
+      return runSql(`SELECT name FROM sqlite_master WHERE type='table'`, db!);
+    },
+    enabled: Boolean(db),
+  });
+};
+
 export const GET_ALL_TABLES = "GET_ALL_TABLES";
 export const useGetAllTables = () => {
   const {

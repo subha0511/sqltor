@@ -1,5 +1,13 @@
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown";
 import { cn } from "../lib/utils";
-import { useGetTableInfo, useGetTableNames } from "../query";
+import { useGetTableInfo, useGetTableNames, useRunQuery } from "../query";
 import {
   Accordion,
   AccordionContent,
@@ -7,14 +15,51 @@ import {
   AccordionTrigger,
 } from "./ui/accordion";
 import { KeyRound } from "lucide-react";
+import { Button } from "./ui/button";
+import { insertEmployees } from "../addTable";
 
 const sidebar = () => {
   const tables = useGetTableNames();
+  console.log(tables);
+  const { mutate } = useRunQuery();
 
   return (
     <div className="w-full">
-      <div className="px-2 py-2 text-zinc-400 border-b border-zinc-600">
-        Tables
+      <div className="px-2 py-2 text-zinc-400 border-b border-zinc-600 flex justify-between items-center">
+        <div>Tables</div>
+        <div>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <div className="h-8 text-sm px-3 py-1 rounded-md border border-neutral-600 hover:bg-neutral-800 grid place-items-center">
+                Add Table
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-58 bg-neutral-900 shadow-lg border border-neutral-700 w-64 rounded-md text-neutral-400"
+              align="end"
+              sideOffset={5}
+            >
+              <DropdownMenuLabel>Add Table</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-neutral-700" />
+              <DropdownMenuItem asChild>
+                <Button
+                  className="hover:bg-neutral-800 w-full pl-5 py-0 h-9 cursor-pointer text-left justify-start"
+                  onClick={() => mutate(insertEmployees)}
+                >
+                  Employees
+                </Button>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Button
+                  className="hover:bg-neutral-800 w-full pl-5 py-0 h-9 cursor-pointer text-left justify-start"
+                  onClick={() => mutate(insertEmployees)}
+                >
+                  Employees
+                </Button>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       {tables?.length === 0 ? (
         <div className="px-2 py-1.5 text-zinc-400">No tables found</div>
@@ -44,6 +89,7 @@ const sidebar = () => {
 
 const TableInfo = ({ tableName }: { tableName: string }) => {
   const { tableInfo, isError } = useGetTableInfo(tableName);
+  console.log(tableInfo, isError);
 
   if (isError) {
     return <div className="text-red-700">Something went wrong</div>;
