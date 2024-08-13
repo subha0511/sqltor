@@ -8,7 +8,6 @@ import {
 } from "react";
 import initSqlJs, { Database } from "sql.js";
 import sqliteUrl from "../assets/sql-wasm.wasm?url";
-// import sqlite from "../assets/sql-wasm.wasm";
 
 const DbContext = createContext<null | any>(null);
 
@@ -30,10 +29,6 @@ export const DbProvider = ({ children }: { children: ReactNode }) => {
       try {
         const SQL = await initSqlJs({
           locateFile: () => sqliteUrl,
-          // locateFile: (file) => {
-          //   console.log(file);
-          //   return `https://sql.js.org/dist/${file}`;
-          // },
         });
         setDbState((prev) => ({
           ...prev,

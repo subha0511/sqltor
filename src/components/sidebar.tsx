@@ -16,7 +16,7 @@ import {
 } from "./ui/accordion";
 import { KeyRound } from "lucide-react";
 import { Button } from "./ui/button";
-import { insertEmployees } from "../addTable";
+import { insertEmployees, insertManagers } from "../addTable";
 
 const sidebar = () => {
   const tables = useGetTableNames();
@@ -48,14 +48,14 @@ const sidebar = () => {
                   Employees
                 </Button>
               </DropdownMenuItem>
-              {/* <DropdownMenuItem asChild>
+              <DropdownMenuItem asChild>
                 <Button
                   className="hover:bg-neutral-800 w-full pl-5 py-0 h-9 cursor-pointer text-left justify-start"
-                  onClick={() => mutate(insertEmployees)}
+                  onClick={() => mutate(insertManagers)}
                 >
-                  Employees
+                  Managers
                 </Button>
-              </DropdownMenuItem> */}
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

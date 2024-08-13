@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useDb } from "./context/dbContext";
 import { Database } from "sql.js";
+import { getSqlCompletions, tableOutputToObject } from "./lib/utils";
 
 export const runSql = (query: string, db: Database) => {
   try {
@@ -21,19 +22,19 @@ export const runSql = (query: string, db: Database) => {
 
 type RunSqlReturn = ReturnType<typeof runSql>;
 
-export const GET_ALL_TABLE_INFO = "GET_ALL_TABLE_INFO";
-export const useGetAllTableInfo = () => {
-  const {
-    dbState: { db },
-  } = useDb();
-  return useQuery({
-    queryKey: [GET_ALL_TABLES],
-    queryFn: () => {
-      return runSql(`SELECT name FROM sqlite_master WHERE type='table'`, db!);
-    },
-    enabled: Boolean(db),
-  });
-};
+// export const GET_ALL_TABLE_INFO = "GET_ALL_TABLE_INFO";
+// export const useGetAllTableInfo = () => {
+//   const {
+//     dbState: { db },
+//   } = useDb();
+//   return useQuery({
+//     queryKey: [GET_ALL_TABLES],
+//     queryFn: () => {
+//       return runSql(`SELECT name FROM sqlite_master WHERE type='table'`, db!);
+//     },
+//     enabled: Boolean(db),
+//   });
+// };
 
 export const GET_ALL_TABLES = "GET_ALL_TABLES";
 export const useGetAllTables = () => {
@@ -103,4 +104,57 @@ export const useGetTableInfo = (tableName: string) => {
   }, [data]);
 
   return { tableInfo, isError, isLoading };
+};
+
+const GET_ALL_TABLE_INFOS = "GET_ALL_TABLE_INFOS";
+export const useGetAllTableInfos = () => {
+  const { data: allTablesData } = useGetAllTables();
+  const {
+    dbState: { db },
+  } = useDb();
+
+  const tableNames =
+    allTablesData?.results?.[0]?.values.reduce(
+      (acc, curr) => [...acc, ...curr],
+      []
+    ) ?? [];
+
+  return useQuery({
+    queryKey: [GET_ALL_TABLE_INFOS, tableNames],
+    queryFn: () => {
+      return Promise.all(
+        tableNames.map((tableName) =>
+          runSql(`PRAGMA table_info(${tableName})`, db!)
+        )
+      );
+    },
+    select: (data) => {
+      const columns = data?.map((item) =>
+        tableOutputToObject(item?.results?.[0] ?? { columns: [], values: [[]] })
+      );
+      return (
+        tableNames.map((tableName, index) => ({
+          table: tableName,
+          columns: columns[index],
+        })) ?? []
+      );
+    },
+  });
+};
+
+export const useGetAutocompletionHints = () => {
+  const { data } = useGetAllTableInfos();
+
+  const table = data?.map((item) => item.table) ?? [];
+  const columns =
+    data?.reduce(
+      (acc, item) => ({
+        ...acc,
+        // @ts-expect-error: noImplicitAny
+        [item.table as string]: item.columns.map((col) => col?.name),
+      }),
+      {}
+    ) ?? {};
+
+  return getSqlCompletions(table, columns);
 };
