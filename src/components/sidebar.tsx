@@ -16,7 +16,7 @@ import {
 } from "./ui/accordion";
 import { KeyRound } from "lucide-react";
 import { Button } from "./ui/button";
-import { insertEmployees, insertManagers } from "../addTable";
+import { insertEmployees, insertManagers } from "../lib/addTable";
 
 const sidebar = () => {
   const tables = useGetTableNames();

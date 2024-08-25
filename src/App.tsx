@@ -1,40 +1,30 @@
-import { useState, useCallback, useMemo } from "react";
+import { useEffect } from "react";
 import Editor from "./components/editor";
-import { useDb } from "./context/dbContext";
 import Sidebar from "./components/sidebar";
 import ResultPreview from "./components/result-preview";
-import { useSqlWorker } from "./hooks/useSqlWorker";
-
-import sqlWorker from "./assets/worker.sql-wasm.js?url";
+import { useBoundStore } from "./store/store";
 
 function App() {
-  const sqlWorkerInstance = useMemo(() => new Worker(sqlWorker), []);
+  const activeDatabase = useBoundStore((state) => state.activeDatabase);
+  const initializeDatabase = useBoundStore((state) => state.initializeDatabase);
 
-  const [editorState, setEditorState] = useState("");
-  const {
-    dbState: { status },
-  } = useDb();
-  useSqlWorker(sqlWorkerInstance);
+  const isLoading = activeDatabase.status === "loading";
+  const isError = activeDatabase.status === "error";
 
-  const isLoading = status === "LOADING";
-  const isError = status === "ERROR";
-
-  const onEditorStateChange = useCallback((val: string) => {
-    setEditorState(val);
+  useEffect(() => {
+    if (activeDatabase.status === "loading") {
+      initializeDatabase();
+    }
   }, []);
 
   return (
     <div className="bg-zinc-900 h-screen w-full flex items-stretch divide-x divide-zinc-700">
       <div className="h-full w-2/3 shrink-0 flex flex-col">
         <div className="overflow-auto grow h-1/2">
-          <Editor value={editorState} onChange={onEditorStateChange} />
+          <Editor />
         </div>
         <div className="h-1/2 shrink-0">
-          <ResultPreview
-            isLoading={isLoading}
-            isError={isError}
-            editorState={editorState}
-          />
+          <ResultPreview isLoading={isLoading} isError={isError} />
         </div>
       </div>
       <div className="w-full">

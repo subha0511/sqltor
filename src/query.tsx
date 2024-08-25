@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { useDb } from "./context/dbContext";
-import { Database } from "sql.js";
 import { getSqlCompletions, tableOutputToObject } from "./lib/utils";
+import { useBoundStore } from "./store/store";
+import { Database } from "sql.js";
 
 export const runSql = (query: string, db: Database) => {
   try {
@@ -11,7 +11,7 @@ export const runSql = (query: string, db: Database) => {
       status: "SUCCESS",
       error: null,
     };
-  } catch (err) {
+  } catch (err: any) {
     return {
       results: null,
       status: "ERROR",
@@ -38,9 +38,7 @@ type RunSqlReturn = ReturnType<typeof runSql>;
 
 export const GET_ALL_TABLES = "GET_ALL_TABLES";
 export const useGetAllTables = () => {
-  const {
-    dbState: { db },
-  } = useDb();
+  const db = useBoundStore((state) => state.activeDatabase.db);
   return useQuery({
     queryKey: [GET_ALL_TABLES],
     queryFn: () => {
@@ -51,9 +49,10 @@ export const useGetAllTables = () => {
 };
 
 export const useRunQuery = () => {
-  const {
-    dbState: { db },
-  } = useDb();
+  // const {
+  //   dbState: { db },
+  // } = useDb();
+  const db = useBoundStore((state) => state.activeDatabase.db);
   const queryClient = useQueryClient();
 
   return useMutation<RunSqlReturn, Error, any, any>({
@@ -71,8 +70,10 @@ export const useGetTableNames = () => {
     if (!results || results.length === 0) {
       return [];
     }
-    const tableNames = results.at(0)?.values.map((row) => row.at(0));
+    // console.log("results", results);
+    const tableNames = results.at(0)?.values?.map((row) => row.at(0));
     return tableNames;
+    return [];
   }, [data]);
 
   return tables;
@@ -80,10 +81,11 @@ export const useGetTableNames = () => {
 
 export const GET_TABLE_INFO = "GET_TABLE_INFO";
 export const useGetTableInfo = (tableName: string) => {
-  const {
-    dbState: { db },
-  } = useDb();
+  // const {
+  //   dbState: { db },
+  // } = useDb();
 
+  const db = useBoundStore((state) => state.activeDatabase.db);
   const { data, isError, isLoading } = useQuery({
     queryKey: [GET_TABLE_INFO, tableName],
     queryFn: () => {
@@ -109,10 +111,11 @@ export const useGetTableInfo = (tableName: string) => {
 const GET_ALL_TABLE_INFOS = "GET_ALL_TABLE_INFOS";
 export const useGetAllTableInfos = () => {
   const { data: allTablesData } = useGetAllTables();
-  const {
-    dbState: { db },
-  } = useDb();
+  // const {
+  //   dbState: { db },
+  // } = useDb();
 
+  const db = useBoundStore((state) => state.activeDatabase.db);
   const tableNames =
     allTablesData?.results?.[0]?.values.reduce(
       (acc, curr) => [...acc, ...curr],

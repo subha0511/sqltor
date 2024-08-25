@@ -1,4 +1,5 @@
 import { useRunQuery } from "../query";
+import { useBoundStore } from "../store/store";
 import {
   Table,
   TableCell,
@@ -11,15 +12,13 @@ import {
 type ResultPreviewProps = {
   isLoading: Boolean;
   isError: Boolean;
-  editorState: string;
 };
 
-const ResultPreview = ({
-  isLoading,
-  isError,
-  editorState,
-}: ResultPreviewProps) => {
+const ResultPreview = ({ isLoading, isError }: ResultPreviewProps) => {
   const { data, mutate } = useRunQuery();
+  const editorState = useBoundStore((state) => state.editorState);
+
+  const isQueryError = data?.status === "ERROR";
 
   return (
     <div className="h-full min-h-0 flex flex-col">
@@ -32,14 +31,6 @@ const ResultPreview = ({
         >
           {isLoading && !isError ? "Loading" : isError ? "Error" : "Run"}
         </button>
-        {/* <button
-          className="px-4 py-2 rounded-lg bg-zinc-700 text-sm text-zinc-300"
-          onClick={() => {
-            !isLoading && !isError ? mutate(insertEmployees) : null;
-          }}
-        >
-          {isLoading ? "Loading" : isError ? "Error" : "Insert Employees"}
-        </button> */}
       </div>
       <div className="grow text-zinc-200 w-full max-h-full overflow-y-scroll">
         {data && !data?.results && !data?.error ? (
@@ -50,8 +41,17 @@ const ResultPreview = ({
           <PreviewTable data={data.results[0]} />
         ) : null}
 
-        {data?.error ? (
-          <span className="text-red-700"> {JSON.stringify(data?.error)}</span>
+        {isQueryError ? (
+          <div className="p-3">
+            <div>
+              <div className="px-3 py-1.5 border-b border-zinc-600 text-xs font-medium text-zinc-400 uppercase rounded-t-md bg-zinc-800 max-w-fit">
+                Error
+              </div>
+              <div className=" text-red-400 rounded-b-md rounded-tr-md px-3 py-2 bg-zinc-800">
+                {data.error?.message}
+              </div>
+            </div>
+          </div>
         ) : null}
       </div>
     </div>

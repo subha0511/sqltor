@@ -2,9 +2,50 @@ import { CompletionContext } from "@codemirror/autocomplete";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+import initSqlJs from "sql.js";
+import sqliteUrl from "../assets/sql-wasm.wasm?url";
+// import SQLWorker from "../worker/worker?worker&url";
+// import { SQLWorkerExport } from "../worker/worker";
+// import * as comlink from "comlink";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+export const workerLog = (...args: any[]) => {
+  console.log(args);
+};
+
+export const workerError = (...args: any[]) => {
+  console.error(args);
+};
+
+export const dbConnector = async () => {
+  const SQL = await initSqlJs({
+    locateFile: () => sqliteUrl,
+  });
+  const db = new SQL.Database();
+  return { db };
+};
+
+// export const wasmDbConnector = async (dbName: string) => {
+//   const sqlWorker = new Worker(SQLWorker, { type: "module" });
+//   sqlWorker.onmessage = (e) => {
+//     switch (e.data.type) {
+//       case "log":
+//         workerLog(e.data.payload);
+//         break;
+//       case "error":
+//         workerError(e.data.payload);
+//         break;
+//       default:
+//         console.log(e.data);
+//     }
+//   };
+//   const obj = comlink.wrap<SQLWorkerExport>(sqlWorker);
+//   const db = await await obj.init(dbName);
+//   return { worker: sqlWorker, workerObject: obj, db };
+// };
 
 export const tableOutputToObject = <T>(schema: {
   columns: T[];

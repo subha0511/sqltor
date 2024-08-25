@@ -6,15 +6,24 @@ import {
   useEffect,
   useState,
 } from "react";
-import initSqlJs, { Database } from "sql.js";
-import sqliteUrl from "../assets/sql-wasm.wasm?url";
+import * as comlink from "comlink";
+import SQLWorker from "../worker/worker?worker&url";
+// import { SQLWorkerExport } from "../worker/worker";
+// import { Database } from "@sqlite.org/sqlite-wasm";
 
 const DbContext = createContext<null | any>(null);
 
 type DBState = {
   status: "SUCCESS" | "LOADING" | "ERROR";
   error: any | null;
-  db: Database | null;
+  db: null;
+};
+
+const workerLog = (...args: any[]) => {
+  console.log(args);
+};
+const workerError = (...args: any[]) => {
+  console.error(args);
 };
 
 export const DbProvider = ({ children }: { children: ReactNode }) => {
@@ -25,26 +34,29 @@ export const DbProvider = ({ children }: { children: ReactNode }) => {
   });
 
   useEffect(() => {
-    const connectSqlWasm = async () => {
-      try {
-        const SQL = await initSqlJs({
-          locateFile: () => sqliteUrl,
-        });
-        setDbState((prev) => ({
-          ...prev,
-          status: "SUCCESS",
-          db: new SQL.Database(),
-        }));
-      } catch (err) {
-        setDbState((prev) => ({
-          ...prev,
-          status: "ERROR",
-          error: err,
-        }));
-      }
-    };
-
-    connectSqlWasm();
+    // const connector = async () => {
+    //   const sqlWorker = new Worker(SQLWorker, { type: "module" });
+    //   sqlWorker.onmessage = (e) => {
+    //     switch (e.data.type) {
+    //       case "log":
+    //         workerLog(e.data.payload);
+    //         break;
+    //       case "error":
+    //         workerError(e.data.payload);
+    //         break;
+    //       default:
+    //         console.log(e.data);
+    //     }
+    //   };
+    //   const obj = comlink.wrap<SQLWorkerExport>(sqlWorker);
+    //   const db = await await obj.init();
+    //   setDbState((prev) => ({
+    //     ...prev,
+    //     status: "SUCCESS",
+    //     db,
+    //   }));
+    // };
+    // connector();
   }, []);
 
   return (
