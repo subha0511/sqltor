@@ -6,7 +6,7 @@ const filesToCopy = [
 ];
 
 // User's local directory
-const userPath = process.env.INIT_CWD ?? "" + "./src/assets";
+const userPath = process.env.INIT_CWD + "/src/assets/";
 
 // Moving files to user's local directory
 gentlyCopy(filesToCopy, userPath);
